@@ -1,60 +1,74 @@
-import logo from "./logo.svg";
-import "./App.css";
-import React from "react";
+import { useState } from 'react';
+import styles from './App.module.css';
 
-export const App = () => {
-	return (
-		<div className="App">
-			<header className="App-header">
-				<img src={logo} className="App-logo" alt="logo" />
-				<p>
-					Edit <code>src/App.js</code> and save to reload 2.
-				</p>
-				<a
-					className="App-link"
-					href="https://reactjs.org"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					Learn React
-				</a>
-				<p>{new Date().getFullYear()}</p> {/* Декларативный*/}
-			</header>
-		</div>
-	);
+const initialState = {
+	email: '',
+	login: '',
+	password: '',
 };
 
-// Код на обычном JS
-export const AppWithOutJSX = () => {
-	return React.createElement(
-		"div",
-		{ className: "App" },
-		React.createElement(
-			"header",
-			{ className: "App-header" },
-			React.createElement("img", {
-				src: logo,
-				className: "App-logo",
-				alt: "logo",
-			}),
-			React.createElement(
-				"p",
-				null,
-				"Edit ",
-				React.createElement("code", null, "src/App.js"),
-				" and save to reload 2."
-			),
-			React.createElement(
-				"a",
-				{
-					className: "App-link",
-					href: "https://reactjs.org",
-					target: "_blank",
-					rel: "noopener noreferrer",
-				},
-				"Learn React"
-			),
-			React.createElement("p", null, new Date().getFullYear())
-		)
+const useStore = () => {
+	const [state, setState] = useState(initialState);
+	return {
+		getState: () => state,
+		updateState: (fieldName, newValue) => {
+			setState({ ...state, [fieldName]: newValue });
+		},
+		resetState: () => {
+			setState(initialState);
+		},
+	};
+};
+
+const sendData = (formData) => {
+	console.log(formData);
+};
+
+export const App = () => {
+	const { getState, updateState, resetState } = useStore({
+		email: '',
+		login: '',
+		password: '',
+	});
+
+	const onSubmit = (event) => {
+		event.preventDefault();
+		sendData(getState());
+	};
+
+	const { email, login, password } = getState();
+
+	const onChange = ({ target }) => updateState(target.name, target.value);
+
+	return (
+		<div className={styles.app}>
+			<form onSubmit={onSubmit}>
+				<input
+					type="email"
+					name="email"
+					placeholder="Почта"
+					value={email}
+					onChange={onChange}
+				/>
+				<input
+					type="login"
+					name="login"
+					placeholder="Логин"
+					value={login}
+					onChange={onChange}
+				/>
+				<input
+					type="password"
+					name="password"
+					placeholder="Пароль"
+					value={password}
+					onChange={onChange}
+				/>
+				<button type="submit">Отправить</button>
+				<button type="button" onClick={resetState}>
+					Сброс
+				</button>
+			</form>
+		</div>
 	);
 };
